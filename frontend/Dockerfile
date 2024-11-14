@@ -10,7 +10,7 @@ COPY ../requirements.txt .
 RUN pip install -r requirements.txt
 
 # Copy the rest of the application code
-COPY . .
+COPY app /app
 
 # Expose the port that flask will run on
 EXPOSE 5000

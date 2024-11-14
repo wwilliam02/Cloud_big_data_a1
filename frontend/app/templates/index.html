@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Event Form</title>
+</head>
+<body>
+    <h2>Enter Event Information</h2>
+    <form id="eventForm">
+        <label for="artist">Artist:</label><br>
+        <input type="text" id="artist" name="artist"><br><br>
+
+        <label for="venue">Venue:</label><br>
+        <input type="text" id="venue" name="venue"><br><br>
+
+        <label for="date">Date:</label><br>
+        <input type="date" id="date" name="date"><br><br>
+
+        <label for="tour">Tour:</label><br>
+        <input type="text" id="tour" name="tour"><br><br>
+
+        <input type="submit" value="Submit">
+    </form>
+      <!-- This is where we'll display the response from Flask -->
+    <div id="responseMessage"></div>
+    <script>
+        // JavaScript to send form data as JSON using fetch
+        document.getElementById('eventForm').addEventListener('submit', function(event) {
+            event.preventDefault();  // Prevent the default form submission
+
+            // Create a JavaScript object with the form data
+            const formData = {
+                artist: document.getElementById('artist').value,
+                venue: document.getElementById('venue').value,
+                date: document.getElementById('date').value,
+                tour: document.getElementById('tour').value
+            };
+            console.log(formData)
+            // Send the form data as JSON to the server using fetch API
+            fetch('/addConsert', {
+                method: 'POST', 
+                headers: {
+                    'Content-Type': 'application/json'  // Indicate that we are sending JSON
+                },
+                body: JSON.stringify(formData)  // Convert the form data object to a JSON string
+            })
+            .then(response => response.json())  // Parse the JSON response from Flask
+            .then(data => {
+                // Handle success: Display the message in the responseMessage div
+                const responseMessageDiv = document.getElementById('responseMessage');
+                 responseMessageDiv.innerHTML = `
+                    <p style="color: green;">Artist: ${data.data.artist}</p>
+                    <p style="color: green;">Venue: ${data.data.venue}</p>
+                    <p style="color: green;">Date: ${data.data.date}</p>
+                    <p style="color: green;">Tour: ${data.data.tour}</p>
+                `;
+            })
+            .catch(error => {
+                // Handle any errors that occur during the fetch request
+                const responseMessageDiv = document.getElementById('responseMessage');
+                responseMessageDiv.innerHTML = `<p style="color: red;">Error: ${error}</p>`;
+            });
+        });
+    </script>
+</body>
+</html>
