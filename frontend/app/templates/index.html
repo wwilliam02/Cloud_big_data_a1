@@ -37,7 +37,7 @@
             };
             console.log(formData)
             // Send the form data as JSON to the server using fetch API
-            fetch('/addConsert', {
+            fetch('/addConcert', {
                 method: 'POST', 
                 headers: {
                     'Content-Type': 'application/json'  // Indicate that we are sending JSON
@@ -49,6 +49,8 @@
                 // Handle success: Display the message in the responseMessage div
                 const responseMessageDiv = document.getElementById('responseMessage');
                  responseMessageDiv.innerHTML = `
+                    <p style="color: green;"> ${data.message.message}</p>
+                    <p style="color: green;">Id: ${data.data.id}</p>
                     <p style="color: green;">Artist: ${data.data.artist}</p>
                     <p style="color: green;">Venue: ${data.data.venue}</p>
                     <p style="color: green;">Date: ${data.data.date}</p>
