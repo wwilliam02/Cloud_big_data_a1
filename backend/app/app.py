@@ -1,10 +1,14 @@
 from flask import Flask, render_template, request, jsonify
-
+from pymongo import MongoClient
+from bson.objectid import ObjectId
 
 app = Flask(__name__)
 
-# in-memory storage for concerts
-concerts = []
+# # in-memory storage for concerts
+# concerts = []
+client = MongoClient("mongodb://localhost:27017")
+db = client.concerts_db # Database
+concerts_collection = db.concerts # collection
 
 @app.route("/")
 def home():
@@ -32,45 +36,47 @@ def addConcert():
         return jsonify({"error": "Artist, Venue and date are required"}), 400
     
     concert = {
-        "id": len(concerts) + 1,
         "artist": artist,
         "venue": venue,
         "date": date,
         "tour": tour,
     }
-    concerts.append(concert)
+    result = concerts_collection.insert_one(concert)
 
-    return jsonify({"message": "Concert added successfully"}), 201
+    return jsonify({"message": "Concert added successfully", "id": str(result.inserted_id)}), 201
 
 
 # get:/concert/<concert_id>/
 @app.route("/concert/<int:id>", methods=["GET"])
 def getConcert(id: int):
     #concert_id = request.args.get("id")
-    concert_id = id
-    if not concert_id:
-        return jsonify({"error": "Conncert ID is required"}), 400
+    # concert_id = id
+    # if not concert_id:
+    #     return jsonify({"error": "Conncert ID is required"}), 400
     
     try:
-        concert_id = int(concert_id)
-    except ValueError:
-        return jsonify({"error": "Concert ID must be an integer"}), 400
+        concert = concerts_collection.find_one({"_id":ObjectId(id)})
+        if not concert:
+            return jsonify({"error": "Concert not found"}), 404
+    except Exception:
+        return jsonify({"error": "Invalid concert ID"}), 400
     
-    concert = None
-    for i in concerts:
-        if i["id"] == concert_id:
-            concert = i
-            break
+ # Convert ObjectId to string for JSON serialization
+    concert["_id"] = str(concert["_id"])
 
-    if not concert:
-        return jsonify({"error":"Concert not found"}), 404
-
-    return jsonify({"data": concert})
+    return jsonify({"data": concert}), 200
 
 @app.route("/allConcerts", methods=["GET"])
 def listAllConcerts():
-    return jsonify({"concerts": concerts}), 200
+    """
+    Retrieve all concerts from the MongoDB database.
+    """
+    concerts = []
+    for concert in concerts_collection.find():
+        concert["_id"] = str(concert["_id"])  # Convert ObjectId to string
+        concerts.append(concert)
 
+    return jsonify({"concerts": concerts}), 200
 
 
 if __name__ == "__main__":

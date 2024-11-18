@@ -23,6 +23,25 @@
     </form>
       <!-- This is where we'll display the response from Flask -->
     <div id="responseMessage"></div>
+    <hr>
+
+    <h2>All Concerts</h2>
+    <button id="loadConcerts">Load All Concerts</button>
+    <table border="1" id="concertsTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Artist</th>
+                <th>Venue</th>
+                <th>Date</th>
+                <th>Tour</th>
+            </tr>
+        </thead>
+        <tbody id="concertsTableBody">
+            <!-- Concert rows will be dynamically added here -->
+        </tbody>
+    </table>
+
     <script>
         // JavaScript to send form data as JSON using fetch
         document.getElementById('eventForm').addEventListener('submit', function(event) {
@@ -35,9 +54,9 @@
                 date: document.getElementById('date').value,
                 tour: document.getElementById('tour').value
             };
-            console.log(formData)
+
             // Send the form data as JSON to the server using fetch API
-            fetch('/addConcert', {
+            fetch('/concert', {
                 method: 'POST', 
                 headers: {
                     'Content-Type': 'application/json'  // Indicate that we are sending JSON
@@ -48,14 +67,11 @@
             .then(data => {
                 // Handle success: Display the message in the responseMessage div
                 const responseMessageDiv = document.getElementById('responseMessage');
-                 responseMessageDiv.innerHTML = `
-                    <p style="color: green;"> ${data.message.message}</p>
-                    <p style="color: green;">Id: ${data.data.id}</p>
-                    <p style="color: green;">Artist: ${data.data.artist}</p>
-                    <p style="color: green;">Venue: ${data.data.venue}</p>
-                    <p style="color: green;">Date: ${data.data.date}</p>
-                    <p style="color: green;">Tour: ${data.data.tour}</p>
+                responseMessageDiv.innerHTML = `
+                    <p style="color: green;">${data.message}</p>
                 `;
+                // Optionally reload concerts list
+                fetchConcerts();
             })
             .catch(error => {
                 // Handle any errors that occur during the fetch request
@@ -63,6 +79,40 @@
                 responseMessageDiv.innerHTML = `<p style="color: red;">Error: ${error}</p>`;
             });
         });
+
+        // Fetch and display all concerts
+        function fetchConcerts() {
+            fetch('/allConcerts', {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementById("concertsTableBody");
+                tableBody.innerHTML = ""; // Clear existing rows
+
+                data.concerts.forEach(concert => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${concert._id}</td>
+                        <td>${concert.artist}</td>
+                        <td>${concert.venue}</td>
+                        <td>${concert.date}</td>
+                        <td>${concert.tour || "N/A"}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error("Error loading concerts:", error);
+            });
+        }
+
+        // Load concerts when the "Load All Concerts" button is clicked
+        document.getElementById('loadConcerts').addEventListener('click', fetchConcerts);
+
+        // Optionally load concerts automatically on page load
+        // window.onload = fetchConcerts;
     </script>
 </body>
 </html>

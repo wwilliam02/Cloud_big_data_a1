@@ -27,29 +27,20 @@ def addConcert():
     data = request.get_json()
     #format and send to backend
 
-    artist = data.get("artist")
-    venue = data.get("venue")
-    date = data.get("date")
-    tour = data.get("tour")
+    # artist = data.get("artist")
+    # venue = data.get("venue")
+    # date = data.get("date")
+    # tour = data.get("tour")
 
 
     event_data = {
-        "id":len(concerts) + 1,
-        "artist": artist,
-        "venue": venue,
-        "date": date,
-        "tour": tour
+        "artist": data.get("artist"),
+        "venue": data.get("venue"),
+        "date": data.get("date"),
+        "tour": data.get("tour")
     }
     
-    concerts.append(event_data)
-
-    #send event_data to backend...
     # concerts.append(event_data)
-
-    #  # Process the data (you could store it in a database or just print it for now)
-    # print(f"Artist: {artist}, Venue: {venue}, Date: {date}, Tour: {tour}", flush=True)
-
-    # url = backend_url + "/concert"
 
     try:
         response = requests.post(url=f"{backend_url}/concert" , json=event_data)
@@ -66,10 +57,23 @@ def addConcert():
     #     print(response.content, flush=True)
 
     # Respond back to the client
-    return jsonify({"message": result, "data": event_data})
+    return jsonify({"message": "Concert added successfully", "data": event_data})
     #return jsonify({"message": "Message sent", "data":event_data})
-    
 
+
+@app.route("/allConcerts")
+def show_all_concerts():
+
+    try:
+        response = requests.get(url=f"{backend_url}/allConcerts")
+        response.raise_for_status()
+        result = response.json()
+    except requests.RequestException as e:
+        print("Error showing concerts: " + e, flush=True)
+        return jsonify({"message: failed to show concerts"}), 500
+    
+    print(result, flush=True)
+    return jsonify(result)
 
 
 if __name__ == "__main__":
