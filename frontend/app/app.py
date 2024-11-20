@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 concerts = []
 
-backend_url = "http://localhost:8080"
+backend_url = "http://backend:8080"
 
 #Home route
 @app.route('/')
@@ -27,12 +27,6 @@ def addConcert():
     data = request.get_json()
     #format and send to backend
 
-    # artist = data.get("artist")
-    # venue = data.get("venue")
-    # date = data.get("date")
-    # tour = data.get("tour")
-
-
     event_data = {
         "artist": data.get("artist"),
         "venue": data.get("venue"),
@@ -47,8 +41,8 @@ def addConcert():
         response.raise_for_status()
         result = response.json()
     except requests.RequestException as e:
-        print("Error adding concert: " + e, flush=True)
-        return jsonify({"message: failed to add concert"}), 500
+        print("Error adding concert: " + str(e), flush=True)
+        return jsonify({"message: failed to add concert": str(e)}), 500
         
     
     # if response.status_code != 201:
@@ -69,12 +63,25 @@ def show_all_concerts():
         response.raise_for_status()
         result = response.json()
     except requests.RequestException as e:
-        print("Error showing concerts: " + e, flush=True)
-        return jsonify({"message: failed to show concerts"}), 500
+        return jsonify({"message: failed to show concerts": str(e)}), 500
     
     print(result, flush=True)
     return jsonify(result)
 
 
+
+@app.route("/concert/<id>", methods=["DELETE"])
+def deleteConcert(id):
+    
+    try:
+        response = requests.delete(url=f"{backend_url}/concert/{id}")
+        response.raise_for_status()
+        result = response.json()
+    except requests.RequestException as e:
+        print("Error deleting concert: " + str(e), flush=True)
+        return jsonify({"message": "Failed to delete concert", "error": str(e)}), 500
+    
+    return jsonify({"message": f"Concert with ID {id} deleted successfully", "data": result})
+    
 if __name__ == "__main__":
     app.run(host = "0.0.0.0", port=5000)

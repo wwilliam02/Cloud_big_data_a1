@@ -1,0 +1,30 @@
+---
+version: "3.8"
+
+services:
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - 5000:5000
+    volumes:
+      - ./frontend/app:/app
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    ports:
+      - 8080:8080
+    volumes:
+      - ./backend/app:/app
+   
+   
+  db:
+    image: mongo:latest
+    command: --quiet --syslog
+    expose:
+      - 27017
