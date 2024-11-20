@@ -11,6 +11,8 @@ services:
       - 5000:5000
     volumes:
       - ./frontend/app:/app
+    env_file:
+      - .env
 
   backend:
     build: 
@@ -21,6 +23,8 @@ services:
       - 8080:8080
     volumes:
       - ./backend/app:/app
+    env_file:
+      - .env
    
    
   db:

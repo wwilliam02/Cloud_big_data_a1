@@ -1,12 +1,17 @@
 from flask import Flask, render_template, request, jsonify
 from pymongo import MongoClient
 from bson.objectid import ObjectId
+import os
+from dotenv import load_dotenv
+
+# load environment variables
+load_dotenv()
 
 app = Flask(__name__)
 
 # # in-memory storage for concerts
-# concerts = []
-client = MongoClient("mongodb://db:27017")
+mongo_uri = os.getenv("MONGO_URI")
+client = MongoClient(mongo_uri)
 db = client.concerts_db # Database
 concerts_collection = db.concerts # collection
 

@@ -1,11 +1,16 @@
 from flask import Flask, render_template, request, jsonify
 import requests
+import os
+from dotenv import load_dotenv
+
+# load environment variables
+load_dotenv()
 
 app = Flask(__name__)
 
 concerts = []
 
-backend_url = "http://backend:8080"
+backend_url = os.getenv("BACKEND_URL")
 
 #Home route
 @app.route('/')
