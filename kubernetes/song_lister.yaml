@@ -1,0 +1,129 @@
+#frontend-deployment.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-svc
+  labels:
+    app: frontend
+spec:
+  type: LoadBalancer
+  selector:
+    app: frontend
+  ports:
+  - port: 5000
+    targetPort: 5000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: song-lister-frontend
+        image: wwilliam02/song_lister_frontend:latest
+        ports:
+        - containerPort: 5000
+        env:
+          - name: BACKEND_URL
+            valueFrom:
+              ConfigMapKeyRef:
+                name: frontend-env
+                key: backend_url
+
+
+
+---
+# backend-deployment.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-svc
+  labels:
+    app: backend
+spec:
+  type: ClusterIP
+  selector:
+    app: frontend
+  ports:
+  - port: 8080
+    targetPort: 8080
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    app: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: song-lister-backend
+        image: wwilliam02/song_lister_backend:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: MONGO_URI
+          valueFrom:
+            ConfigMapKeyRef:
+              name: backend-env
+              key: mongo_uri
+
+
+
+
+
+
+
+
+
+
+
+# mongo-deployment.yaml
+
+# frontend-configmap.yaml
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+  labels:
+    data: config
+data:
+  # Add environment variables here for frontend
+  # Example:
+  backend_url: "NOTSET"
+---
+# backend-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  labels: 
+    data: config
+data:
+  # Add environment variables here for backend
+  # Example:
+  mongo_uri: "NOTSET"
+---
