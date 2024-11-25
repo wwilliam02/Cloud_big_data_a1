@@ -9,26 +9,26 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# # in-memory storage for concerts
+# Database setup
 mongo_uri = os.getenv("MONGO_URI")
 client = MongoClient(mongo_uri)
-db = client.concerts_db # Database
-concerts_collection = db.concerts # collection
-
+db = client.concerts_db 
+concerts_collection = db.concerts
 
 
 @app.route("/")
 def home():
     """
-    A simple home route to provide a basic message or interface.
+    Used for testing frontend com.
     """
     return jsonify({"message": "Welcome to the Concert Management API"})
 
 
-
-
 @app.route("/concert", methods=["POST"])
 def addConcert():
+    """
+    Adds concert to database
+    """
     data = request.get_json()
 
     if not data:
@@ -39,7 +39,6 @@ def addConcert():
     date = data.get("date")
     tour = data.get("tour")
     
-
     if not artist or not venue or not date:
         return jsonify({"error": "Artist, Venue and date are required"}), 400
     
@@ -72,13 +71,11 @@ def deleteConcert(id):
         return jsonify({"error": "Invalid concert ID"}), 400
 
 # get:/concert/<concert_id>/
-@app.route("/concert/<int:id>", methods=["GET"])
+@app.route("/concert/<id>", methods=["GET"])
 def getConcert(id: str):
-    #concert_id = request.args.get("id")
-    # concert_id = id
-    # if not concert_id:
-    #     return jsonify({"error": "Conncert ID is required"}), 400
-    
+    """
+    Fix if we should use it
+    """
     try:
         concert = concerts_collection.find_one({"_id":ObjectId(id)})
         if not concert:
@@ -91,7 +88,7 @@ def getConcert(id: str):
 
     return jsonify({"data": concert}), 200
 
-@app.route("/allConcerts", methods=["GET"])
+@app.route("/concert", methods=["GET"])
 def listAllConcerts():
     """
     Retrieve all concerts from the MongoDB database.

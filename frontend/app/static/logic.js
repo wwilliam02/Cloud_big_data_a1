@@ -11,7 +11,7 @@
             };
 
             // Send the form data as JSON to the server using fetch API
-            fetch('/addConcert', {
+            fetch('/concert', {
                 method: 'POST', 
                 headers: {
                     'Content-Type': 'application/json'  // Indicate that we are sending JSON
@@ -37,7 +37,7 @@
 
         // Fetch and display all concerts
         function fetchConcerts() {
-            fetch('/allConcerts', {
+            fetch('/concert', {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
             })
