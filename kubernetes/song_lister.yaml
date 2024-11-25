@@ -36,11 +36,11 @@ spec:
         ports:
         - containerPort: 5000
         env:
-          - name: BACKEND_URL
-            valueFrom:
-              ConfigMapKeyRef:
-                name: frontend-env
-                key: backend_url
+        - name: BACKEND_URL
+          valueFrom:
+            configMapKeyRef:
+              name: frontend-config
+              key: backend_url
 
 
 
@@ -56,7 +56,7 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app: frontend
+    app: backend
   ports:
   - port: 8080
     targetPort: 8080
@@ -86,21 +86,9 @@ spec:
         env:
         - name: MONGO_URI
           valueFrom:
-            ConfigMapKeyRef:
-              name: backend-env
+            configMapKeyRef:
+              name: backend-config
               key: mongo_uri
-
-
-
-
-
-
-
-
-
-
-
-# mongo-deployment.yaml
 
 # frontend-configmap.yaml
 ---
@@ -112,8 +100,7 @@ metadata:
     data: config
 data:
   # Add environment variables here for frontend
-  # Example:
-  backend_url: "NOTSET"
+  backend_url: http://backend-svc:8080
 ---
 # backend-config.yaml
 apiVersion: v1
@@ -124,6 +111,60 @@ metadata:
     data: config
 data:
   # Add environment variables here for backend
-  # Example:
-  mongo_uri: "NOTSET"
+  mongo_uri: mongodb://mongodb:27017
 ---
+apiVersion: v1
+kind: Service
+metadata:
+ name: mongodb
+ labels:
+  app: mongodb
+spec:
+ ports:
+  - port: 27017
+    targetPort: mongodb-port
+ selector:
+  app: mongodb
+---
+# mongo-deployment-yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+spec:
+  selector:
+    matchLabels:
+      app: mongodb
+  serviceName: mongodb
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo
+        ports:
+        - containerPort: 27017
+          name: mongodb-port
+        volumeMounts:
+        - name: mongo-storage
+          mountPath: /data/db
+        - name: mongo-config
+          mountPath: /data/configdb
+  volumeClaimTemplates:
+  - metadata:
+      name: mongo-storage
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 10Mi
+  - metadata:
+      name: mongo-config
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 5Mi
