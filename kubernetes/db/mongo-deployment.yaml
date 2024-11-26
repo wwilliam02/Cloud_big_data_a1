@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+spec:
+  selector:
+    matchLabels:
+      app: mongodb
+  serviceName: mongodb
+  replicas: 1 # number of mongodb pods to deploy
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo # docker image for mongodb
+        ports:
+        - containerPort: 27017
+          name: mongodb-port # name for the exposed port
+        volumeMounts:
+        - name: mongo-storage # Persistent volume for MongoDB database storage
+          mountPath: /data/db # path in the container where the database files are stored
+        - name: mongo-config
+          mountPath: /data/configdb # path in the container for config data
+  volumeClaimTemplates: # defines the persistent storage requirements
+  - metadata:
+      name: mongo-storage
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 10Mi
+  - metadata:
+      name: mongo-config
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 5Mi

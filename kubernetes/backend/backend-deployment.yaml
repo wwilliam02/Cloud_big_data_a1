@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    app: backend
+spec:
+  replicas: 1 # creates 1 instance
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: concert-lister-backend
+        image: wwilliam02/concert_lister_backend:latest #dockerhub
+        ports:
+        - containerPort: 8080
+        env:
+        - name: MONGO_URI
+          valueFrom:
+            configMapKeyRef:
+              name: backend-config
+              key: mongo_uri # uses the value from the configmap

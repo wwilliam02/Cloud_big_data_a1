@@ -70,23 +70,6 @@ def deleteConcert(id):
     except Exception as e:
         return jsonify({"error": "Invalid concert ID"}), 400
 
-# get:/concert/<concert_id>/
-@app.route("/concert/<id>", methods=["GET"])
-def getConcert(id: str):
-    """
-    Fix if we should use it
-    """
-    try:
-        concert = concerts_collection.find_one({"_id":ObjectId(id)})
-        if not concert:
-            return jsonify({"error": "Concert not found"}), 404
-    except Exception:
-        return jsonify({"error": "Invalid concert ID"}), 400
-    
- # Convert ObjectId to string for JSON serialization
-    concert["_id"] = str(concert["_id"])
-
-    return jsonify({"data": concert}), 200
 
 @app.route("/concert", methods=["GET"])
 def listAllConcerts():

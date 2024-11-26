@@ -1,5 +1,5 @@
         // JavaScript to send form data as JSON using fetch
-        document.getElementById('eventForm').addEventListener('submit', function(event) {
+        document.getElementById('concertLister').addEventListener('submit', function(event) {
             event.preventDefault();  // Prevent the default form submission
 
             // Create a JavaScript object with the form data

@@ -1,0 +1,10 @@
+#config map for the backend
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  labels: 
+    data: config
+data:
+  # sets the mongo_uri to the correct value
+  mongo_uri: mongodb://mongodb:27017
