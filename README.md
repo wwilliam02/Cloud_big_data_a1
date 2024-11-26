@@ -23,27 +23,27 @@ git clone https://github.com/wwilliam02/Cloud_big_data_a1
 ### 2. Make sure that you are in the correct directory before procceding:
 Make sure that you stand at the same level as the root directory of the repo
 
-### 2. Build and Push Docker Images:
+### 3. Build and Push Docker Images:
 Build and push the docker images for frontend and backend:
 
 ```bash
 make dockerPush DOCKER_USER=yourdockerusername
 ```
 
-### 3. Deploy to kubernetes:
+### 4. Deploy to kubernetes:
 Apply the kubernetes configurations to deploy the application:
 
 ```bash
 make apply
 ```
 
-### 4. View logs:
+### 5. View logs:
 Fetch logs for the frontend and backend pods:
 ```bash
 make logs
 ```
 
-### 5. Clean up kubernetes resources:
+### 6. Clean up kubernetes resources:
 To delete all resources:
 ```bash
 make clean
